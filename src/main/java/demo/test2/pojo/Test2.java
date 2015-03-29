@@ -1,5 +1,8 @@
 package demo.test2.pojo;
 
+import org.mybatis.extension.auto.annotation.Entity;
+
+@Entity
 public class Test2 {
 	private String testName2;
 

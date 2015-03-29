@@ -28,7 +28,7 @@ public class EntityParseScanPackage {
 	}
 
 	public static void main(String[] args) {
-		for (Class<?> clazz : getClassName("demo.test.pojo")) {
+		for (Class<?> clazz : getClassName("demo")) {
 			System.out.println(clazz.getName());
 		}
 	}

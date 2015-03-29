@@ -113,15 +113,18 @@ public class AutoDataSourceDriver {
 
 		List<Class<?>> clazzes = new ArrayList<Class<?>>();
 		for (String autoPackage : this.getAutoPackages()) {
+			logger.info("EntityParseScanPackage : " + autoPackage);
 			clazzes.addAll(EntityParseScanPackage.getClassName(autoPackage));
 		}
-		IDatabaseDialect databaseDialect = null;
+		for (Class<?> clzz : clazzes) {
+			logger.info("EntityParseScanPackage clazzes : " + clzz.getName());
+		}
 		Class<?> dialectClass = Class.forName(this.getDialectClassName());
 		Constructor<?> constructor = dialectClass.getConstructor(
 				Connection.class, boolean.class, boolean.class, List.class);
-		databaseDialect = (IDatabaseDialect) constructor.newInstance(this
-				.getDataSource().getConnection(), this.isShowSql(), this
-				.isFormatSql(), clazzes);
+		IDatabaseDialect databaseDialect = (IDatabaseDialect) constructor
+				.newInstance(this.getDataSource().getConnection(),
+						this.isShowSql(), this.isFormatSql(), clazzes);
 		if (this.getAuto().equalsIgnoreCase(AUTOTYPE_CREATE)) {
 			databaseDialect.create();
 		} else if (this.getAuto().equalsIgnoreCase(AUTOTYPE_UPDATE)) {
