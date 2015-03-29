@@ -11,7 +11,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.mybatis.extension.auto.dialect.IDatabaseDialect;
-import org.mybatis.extension.auto.parse.ParseScanPackage;
+import org.mybatis.extension.auto.parse.EntityParseScanPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,8 +113,7 @@ public class AutoDataSourceDriver {
 
 		List<Class<?>> clazzes = new ArrayList<Class<?>>();
 		for (String autoPackage : this.getAutoPackages()) {
-			clazzes.addAll(ParseScanPackage
-					.getClassesByPackageName(autoPackage));
+			clazzes.addAll(EntityParseScanPackage.getClassName(autoPackage));
 		}
 		IDatabaseDialect databaseDialect = null;
 		Class<?> dialectClass = Class.forName(this.getDialectClassName());
