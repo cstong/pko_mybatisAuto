@@ -19,13 +19,16 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 
 	protected boolean isShowSql;
 
+	protected boolean isFormatSql;
+
 	protected List<Class<?>> clazzes;
 
 	public DatabaseDialect(Connection connection, boolean isShowSql,
-			List<Class<?>> clazzes) {
+			boolean isFormatSql, List<Class<?>> clazzes) {
 		super();
 		this.connection = connection;
 		this.isShowSql = isShowSql;
+		this.isFormatSql = isFormatSql;
 		this.clazzes = clazzes;
 	}
 

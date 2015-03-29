@@ -27,8 +27,8 @@ import org.springframework.util.ClassUtils;
 public class MysqlDialect extends DatabaseDialect {
 
 	public MysqlDialect(Connection connection, boolean isShowSql,
-			List<Class<?>> clazzes) {
-		super(connection, isShowSql, clazzes);
+			boolean isFormatSql, List<Class<?>> clazzes) {
+		super(connection, isShowSql, isFormatSql, clazzes);
 	}
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -37,92 +37,82 @@ public class MysqlDialect extends DatabaseDialect {
 	public void create() throws SQLException {
 		System.out.println("======create====");
 		List<String> sqls = new ArrayList<String>();
-		List<String> foreigns = new ArrayList<String>();
+		List<String> foreignSqls = new ArrayList<String>();
 		// 取消外键约束，方便create或者update
-		sqls.add("SET FOREIGN_KEY_CHECKS=0;");
+		sqls.add("SET FOREIGN_KEY_CHECKS = 0;");
 		for (Class<?> clazz : this.clazzes) {
 			StringBuffer sql = new StringBuffer("");
 			String idField = "";
-			if (clazz.isAnnotationPresent(Entity.class)) {
-				Entity tableAnnotion = (Entity) clazz
-						.getAnnotation(Entity.class);
-				String tableName = tableAnnotion.tableName();
-				if (tableName.equals("")) {
-					tableName = ClassUtils.getShortName(clazz).toUpperCase();
-					// throw new Exception("类：[" + clazz.getName() +
-					// "]未指定正确的表名!");
-				}
-				sqls.add("DROP TABLE IF EXISTS " + tableName + ";");
-				sql.append("CREATE TABLE " + tableName + "(\n");
-				java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
-				for (java.lang.reflect.Field field : fields)
-					if (field.isAnnotationPresent(Field.class)) {
-						Field fieldAnnotion = (Field) field
-								.getAnnotation(Field.class);
-						String fieldName = fieldAnnotion.fieldName();
-						String fieldType = fieldAnnotion.type().toString();
-						int fieldLength = fieldAnnotion.length();
-						boolean fieldNullable = fieldAnnotion.nullable();
-						if (fieldName.equals("")) {
-							fieldName = field.getName().toUpperCase();
-							// throw new Exception("类：" + clazz.getName() +
-							// "的属性["
-							// + field.getName() + "]未指定正确的字段名!");
-						}
-						boolean hasIdAnnotion = field
-								.isAnnotationPresent(Id.class);
-						if (hasIdAnnotion) {
-							sql.append("\t" + fieldName
-									+ " INT(11) NOT NULL AUTO_INCREMENT");
-						} else {
-							if (fieldAnnotion.fKey().length > 0) {
-								ForeignKey foreignKey = fieldAnnotion.fKey()[0];
-								String foreignKeyTableName = foreignKey
-										.tableName();
-								String foreignKeyFieldName = foreignKey
-										.fieldName();
-								if (!foreignKeyTableName.equals("")
-										&& !foreignKeyFieldName.equals("")) {
-									String foreign_key_name = "FK_" + tableName
-											+ "_" + fieldName;
-									StringBuffer foreign = new StringBuffer("");
-									foreign.append("ALTER TABLE " + tableName
-											+ " ");
-									foreign.append("ADD CONSTRAINT "
-											+ foreign_key_name
-											+ " FOREIGN KEY(" + fieldName
-											+ ") REFERENCES "
-											+ foreignKeyTableName + "("
-											+ foreignKeyFieldName + ");\n");
-									foreigns.add(foreign.toString());
-									sql.append("\t" + fieldName + " INT(11)");
-								}
-							} else {
-								sql.append("\t" + fieldName + " " + fieldType);
-								if (fieldType.endsWith("INT"))
-									sql.append("("
-											+ (fieldLength == 255 ? 11
-													: fieldLength) + ")");
-								else if (fieldType.equals("VARCHAR")) {
-									sql.append("(" + fieldLength + ")");
-								}
-							}
-							sql.append(!fieldNullable ? " NOT NULL" : "");
-						}
-						if (idField.equals("")) {
-							idField = hasIdAnnotion ? fieldName : "";
-						}
-						sql.append(",\n");
-					}
-				if (!idField.equals("")) {
-					sql.append("\tPRIMARY KEY (" + idField + ")");
-				}
-				sql.append("\n);");
-				sqls.add(sql.toString());
+			if (!clazz.isAnnotationPresent(Entity.class)) {
+				continue;
 			}
+			Entity tableAnnotion = (Entity) clazz.getAnnotation(Entity.class);
+			String tableName = tableAnnotion.tableName();
+			if (tableName.equals("")) {
+				tableName = ClassUtils.getShortName(clazz).toUpperCase();
+			}
+			sqls.add("DROP TABLE IF EXISTS " + tableName + ";");
+			sql.append("CREATE TABLE " + tableName + "(\n");
+			java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
+			for (java.lang.reflect.Field field : fields) {
+				if (!field.isAnnotationPresent(Field.class)) {
+					continue;
+				}
+				Field fieldAnnotion = (Field) field.getAnnotation(Field.class);
+				String fieldName = fieldAnnotion.fieldName();
+				String fieldType = fieldAnnotion.type().toString();
+				int fieldLength = fieldAnnotion.length();
+				boolean fieldNullable = fieldAnnotion.nullable();
+				if (fieldName.equals("")) {
+					fieldName = field.getName().toUpperCase();
+				}
+				boolean hasIdAnnotion = field.isAnnotationPresent(Id.class);
+				if (hasIdAnnotion) {
+					fieldType = "INT";
+					fieldLength = 11;
+					sql.append("\t" + fieldName + " " + fieldType + "("
+							+ fieldLength + ") NOT NULL AUTO_INCREMENT");
+				} else {
+					if (fieldAnnotion.fKey().length > 0) {
+						ForeignKey foreignKey = fieldAnnotion.fKey()[0];
+						String foreignKeyTableName = foreignKey.tableName();
+						String foreignKeyFieldName = foreignKey.fieldName();
+						if (!foreignKeyTableName.equals("")
+								&& !foreignKeyFieldName.equals("")) {
+							String foreign_key_name = "FK_" + tableName + "_"
+									+ fieldName;
+							StringBuffer foreignSql = new StringBuffer("");
+							foreignSql.append("ALTER TABLE " + tableName + " ");
+							foreignSql.append("ADD CONSTRAINT "
+									+ foreign_key_name + " FOREIGN KEY("
+									+ fieldName + ") REFERENCES "
+									+ foreignKeyTableName + "("
+									+ foreignKeyFieldName + ");\n");
+							foreignSqls.add(foreignSql.toString());
+							fieldType = "INT";
+							fieldLength = 11;
+						}
+					}
+					if (fieldType.endsWith("INT")) {
+						fieldLength = fieldLength == 255 ? 11 : fieldLength;
+					}
+					sql.append("\t" + fieldName + " " + fieldType + "("
+							+ fieldLength + ")");
+					sql.append(fieldNullable ? "" : " NOT NULL");
+				}
+				if (idField.equals("")) {
+					idField = hasIdAnnotion ? fieldName : "";
+				}
+				sql.append(",\n");
+			}
+			if (!idField.equals("")) {
+				sql.append("\tPRIMARY KEY (" + idField + ")");
+			}
+			sql.append("\n);");
+			sqls.add(sql.toString());
 		}
-		sqls.addAll(foreigns);
-		sqls.add("SET FOREIGN_KEY_CHECKS=1;");
+		sqls.addAll(foreignSqls);
+		sqls.add("SET FOREIGN_KEY_CHECKS = 1;");
 		this.executeSqls(sqls);
 	}
 
@@ -130,138 +120,113 @@ public class MysqlDialect extends DatabaseDialect {
 	public void update() throws SQLException {
 		System.out.println("======update====");
 		List<String> sqls = new ArrayList<String>();
-		List<String> foreigns = new ArrayList<String>();
-		List<String> alterUpdates = new ArrayList<String>();
-		sqls.add("SET FOREIGN_KEY_CHECKS=0;");
+		List<String> foreignSqls = new ArrayList<String>();
+		List<String> alterUpdateSqls = new ArrayList<String>();
+		sqls.add("SET FOREIGN_KEY_CHECKS = 0;");
 		for (Class<?> clazz : this.clazzes) {
 			StringBuffer sql = new StringBuffer("");
 			String idField = "";
-			if (clazz.isAnnotationPresent(Entity.class)) {
-				Entity tableAnnotion = (Entity) clazz
-						.getAnnotation(Entity.class);
-				String tableName = tableAnnotion.tableName();
-				if (tableName.equals("")) {
-					tableName = ClassUtils.getShortName(clazz).toUpperCase();
-					// throw new DaoException("类:[" + clazz.getName()
-					// + "]未指明正确的表名!");
+			if (!clazz.isAnnotationPresent(Entity.class)) {
+				continue;
+			}
+			Entity tableAnnotion = (Entity) clazz.getAnnotation(Entity.class);
+			String tableName = tableAnnotion.tableName();
+			if (tableName.equals("")) {
+				tableName = ClassUtils.getShortName(clazz).toUpperCase();
+			}
+			sql.append("CREATE TABLE IF NOT EXISTS " + tableName + "(\n");
+
+			java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
+			for (java.lang.reflect.Field field : fields) {
+				if (!field.isAnnotationPresent(Field.class)) {
+					continue;
 				}
-				sql.append("CREATE TABLE IF NOT EXISTS " + tableName + "(\n");
-				java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
-				for (java.lang.reflect.Field field : fields)
-					if (field.isAnnotationPresent(Field.class)) {
-						Field fieldAnnotion = (Field) field
-								.getAnnotation(Field.class);
-						String fieldName = fieldAnnotion.fieldName();
-						if (fieldName.equals("")) {
-							fieldName = field.getName().toUpperCase();
-							// throw new DaoException("类：" + clazz.getName()
-							// + "的属性[" + field.getName() + "]未指定正确的字段名!");
-						}
-						boolean hasIdAnnotion = field
-								.isAnnotationPresent(Id.class);
-						if (hasIdAnnotion) {
-							sql.append("\t" + fieldName
-									+ " INT(11) NOT NULL AUTO_INCREMENT");
-						} else {
-							ForeignKey foreignKey = fieldAnnotion.fKey()[0];
-							String foreignKeyTableName = foreignKey.tableName();
-							String foreignKeyFieldName = foreignKey.fieldName();
-							if (!foreignKeyTableName.equals("")) {
-								String foreign_key_name = "FK_" + tableName
-										+ "_" + fieldName;
-								try {
-									PreparedStatement preparedStatement = this.connection
-											.prepareStatement(
-													"SELECT COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE where constraint_name='"
-															+ foreign_key_name
-															+ "'", 1004, 1007);
-									ResultSet resultSet = preparedStatement
-											.executeQuery();
-									resultSet.last();
-									if (resultSet.getRow() == 0) {
-										StringBuffer foreign = new StringBuffer(
-												"");
-										foreign.append("ALTER TABLE "
-												+ tableName + " ");
-										foreign.append("ADD CONSTRAINT "
-												+ foreign_key_name
-												+ " FOREIGN KEY(" + fieldName
-												+ ") REFERENCES "
-												+ foreignKeyTableName + "("
-												+ foreignKeyFieldName + ");\n");
-										foreigns.add(foreign.toString());
-									}
-									sql.append("\t" + fieldName + " INT(11)");
-									sql.append(!fieldAnnotion.nullable() ? " NOT NULL"
-											: "");
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							} else {
-								sql.append("\t" + fieldName + " "
-										+ fieldAnnotion.type().toString());
-								if (fieldAnnotion.type().toString()
-										.equals("INT"))
-									sql.append("("
-											+ (fieldAnnotion.length() == 255 ? 11
-													: fieldAnnotion.length())
-											+ ")");
-								else if (fieldAnnotion.type().toString()
-										.equals("VARCHAR")) {
-									sql.append("(" + fieldAnnotion.length()
-											+ ")");
-								}
-								sql.append(!fieldAnnotion.nullable() ? " NOT NULL"
-										: "");
-							}
-						}
-						if (idField.equals(""))
-							idField = hasIdAnnotion ? fieldName : "";
-						try {
-							String assertField = "DESCRIBE " + tableName + " "
+				Field fieldAnnotion = (Field) field.getAnnotation(Field.class);
+				String fieldName = fieldAnnotion.fieldName();
+				String fieldType = fieldAnnotion.type().toString();
+				int fieldLength = fieldAnnotion.length();
+				boolean fieldNullable = fieldAnnotion.nullable();
+				if (fieldName.equals("")) {
+					fieldName = field.getName().toUpperCase();
+				}
+				boolean hasIdAnnotion = field.isAnnotationPresent(Id.class);
+				if (hasIdAnnotion) {
+					sql.append("\t" + fieldName
+							+ " INT(11) NOT NULL AUTO_INCREMENT");
+				} else {
+					if (fieldAnnotion.fKey().length > 0) {
+						ForeignKey foreignKey = fieldAnnotion.fKey()[0];
+						String foreignKeyTableName = foreignKey.tableName();
+						String foreignKeyFieldName = foreignKey.fieldName();
+						if (!foreignKeyTableName.equals("")
+								&& !foreignKeyFieldName.equals("")) {
+							String foreign_key_name = "FK_" + tableName + "_"
 									+ fieldName;
 							PreparedStatement preparedStatement = this.connection
-									.prepareStatement(assertField, 1004, 1007);
+									.prepareStatement(
+											"SELECT COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE where constraint_name='"
+													+ foreign_key_name + "'",
+											ResultSet.TYPE_SCROLL_INSENSITIVE,
+											ResultSet.CONCUR_READ_ONLY);
 							ResultSet resultSet = preparedStatement
 									.executeQuery();
 							resultSet.last();
 							if (resultSet.getRow() == 0) {
-								String type = fieldAnnotion.type().toString();
-								int length = fieldAnnotion.length();
-								String typeSql = "";
-								if (type.equalsIgnoreCase("INT"))
-									typeSql = "INT("
-											+ (length == 255 ? 11 : length)
-											+ ") ";
-								else if (type.equalsIgnoreCase("VARCHAR"))
-									typeSql = "VARCHAR(" + length + ") ";
-								else {
-									typeSql = fieldAnnotion.type().toString()
-											+ " ";
-								}
-								alterUpdates.add("ALTER TABLE "
-										+ tableName
-										+ " ADD COLUMN "
-										+ fieldName
-										+ " "
-										+ typeSql
-										+ (fieldAnnotion.nullable() ? ""
-												: "NOT NULL"));
+								StringBuffer foreignSql = new StringBuffer("");
+								foreignSql.append("ALTER TABLE " + tableName
+										+ " ");
+								foreignSql.append("ADD CONSTRAINT "
+										+ foreign_key_name + " FOREIGN KEY("
+										+ fieldName + ") REFERENCES "
+										+ foreignKeyTableName + "("
+										+ foreignKeyFieldName + ");\n");
+								foreignSqls.add(foreignSql.toString());
 							}
-						} catch (Exception localException1) {
+							fieldType = "INT";
+							fieldLength = 11;
 						}
-						sql.append(",\n");
 					}
-				if (!idField.equals("")) {
-					sql.append("\tPRIMARY KEY (" + idField + ")");
+					if (fieldType.endsWith("INT")) {
+						fieldLength = fieldLength == 255 ? 11 : fieldLength;
+					}
+					sql.append("\t" + fieldName + " " + fieldType + "("
+							+ fieldLength + ")");
+					sql.append(!fieldNullable ? " NOT NULL" : "");
 				}
-				sql.append("\n);\n");
-				sqls.add(sql.toString());
+				if (idField.equals("")) {
+					idField = hasIdAnnotion ? fieldName : "";
+				}
+				// 查看表结构，是否已有该字段
+				String assertField = "DESCRIBE " + tableName + " " + fieldName;
+				PreparedStatement preparedStatement = this.connection
+						.prepareStatement(assertField,
+								ResultSet.TYPE_SCROLL_INSENSITIVE,
+								ResultSet.CONCUR_READ_ONLY);
+				ResultSet resultSet = preparedStatement.executeQuery();
+				resultSet.last();
+				if (resultSet.getRow() == 0) {
+					if (fieldType.equalsIgnoreCase("INT")) {
+						fieldLength = fieldLength == 255 ? 11 : fieldLength;
+					}
+					StringBuffer alterUpdateSql = new StringBuffer("");
+					alterUpdateSql.append("ALTER TABLE " + tableName
+							+ " ADD COLUMN ");
+					alterUpdateSql.append(fieldName + " " + fieldType + "("
+							+ fieldLength + ")");
+					alterUpdateSql.append(!fieldNullable ? " NOT NULL" : "");
+					alterUpdateSqls.add(alterUpdateSql.toString());
+				}
+				sql.append(",\n");
 			}
+			if (!idField.equals("")) {
+				sql.append("\tPRIMARY KEY (" + idField + ")");
+			}
+			sql.append("\n);\n");
+			sqls.add(sql.toString());
 		}
-		sqls.addAll(foreigns);
-		sqls.addAll(alterUpdates);
-		sqls.add("SET FOREIGN_KEY_CHECKS=1;");
+		sqls.addAll(foreignSqls);
+		sqls.addAll(alterUpdateSqls);
+		sqls.add("SET FOREIGN_KEY_CHECKS = 1;");
 		this.executeSqls(sqls);
 	}
 
@@ -269,7 +234,7 @@ public class MysqlDialect extends DatabaseDialect {
 		Statement statement = this.connection.createStatement();
 		for (String sql : sqls) {
 			if (this.isShowSql) {
-				logger.info("mybatiSql:" + sql);
+				logger.info("mybatiSql : " + sql);
 			}
 			statement.addBatch(sql);
 		}

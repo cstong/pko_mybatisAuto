@@ -37,6 +37,8 @@ public class AutoDataSourceDriver {
 	private String auto;
 	// 是否打印sql(true、false)
 	private boolean showSql;
+	// 是否格式化sql(true、false) TODO 待实现
+	private boolean formatSql;
 	// 测试sql
 	private String testSql;
 	// 自动建表遍历包
@@ -60,6 +62,14 @@ public class AutoDataSourceDriver {
 
 	public void setShowSql(boolean showSql) {
 		this.showSql = showSql;
+	}
+
+	public boolean isFormatSql() {
+		return formatSql;
+	}
+
+	public void setFormatSql(boolean formatSql) {
+		this.formatSql = formatSql;
 	}
 
 	public String getTestSql() {
@@ -109,9 +119,10 @@ public class AutoDataSourceDriver {
 		IDatabaseDialect databaseDialect = null;
 		Class<?> dialectClass = Class.forName(this.getDialectClassName());
 		Constructor<?> constructor = dialectClass.getConstructor(
-				Connection.class, boolean.class, List.class);
+				Connection.class, boolean.class, boolean.class, List.class);
 		databaseDialect = (IDatabaseDialect) constructor.newInstance(this
-				.getDataSource().getConnection(), this.isShowSql(), clazzes);
+				.getDataSource().getConnection(), this.isShowSql(), this
+				.isFormatSql(), clazzes);
 		if (this.getAuto().equalsIgnoreCase(AUTOTYPE_CREATE)) {
 			databaseDialect.create();
 		} else if (this.getAuto().equalsIgnoreCase(AUTOTYPE_UPDATE)) {
@@ -122,16 +133,18 @@ public class AutoDataSourceDriver {
 	private void testSql() throws SQLException {
 		Connection connection = this.getDataSource().getConnection();
 		Statement statement = connection.createStatement();
-		if (this.getTestSql() != null) {
-			ResultSet resultSet = statement.executeQuery(this.getTestSql());
-			resultSet.last();
-			if (resultSet.getRow() != 0) {
-				if (this.isShowSql()) {
-					logger.info("test database success:" + this.getTestSql());
-				} else {
-					logger.info("test database success");
-				}
-			}
+		if (this.getTestSql() == null) {
+			return;
+		}
+		ResultSet resultSet = statement.executeQuery(this.getTestSql());
+		resultSet.last();
+		if (resultSet.getRow() == 0) {
+			return;
+		}
+		if (this.isShowSql()) {
+			logger.info("test database success:" + this.getTestSql());
+		} else {
+			logger.info("test database success");
 		}
 	}
 }

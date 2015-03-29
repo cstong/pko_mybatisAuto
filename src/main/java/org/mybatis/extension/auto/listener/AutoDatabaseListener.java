@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import test.demo.logback.LogbackTest;
-
 public class AutoDatabaseListener implements ServletContextListener {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
