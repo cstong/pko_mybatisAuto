@@ -1,6 +1,8 @@
 package org.mybatis.extension.auto.parse;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -34,21 +36,33 @@ public class ParseScanPackage {
 	public static List<Class<?>> getClassName(String packageName,
 			boolean childPackage) {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		ClassLoader classLoader = Thread.currentThread()
-				.getContextClassLoader();
-		String packagePath = packageName.replace(".", "/");
-		URL url = classLoader.getResource(packagePath);
-		if (url != null) {
-			String type = url.getProtocol();
-			if (type.equals("file")) {
-				classes = getClassNameByFile(url.getPath(), childPackage);
-			} else if (type.equals("jar")) {
-				classes = getClassNameByJar(url.getPath(), childPackage);
+		try {
+			ClassLoader classLoader = Thread.currentThread()
+					.getContextClassLoader();
+			String packagePath = packageName.replace(".", "/");
+			URL url = classLoader.getResource(packagePath);
+			if (url != null) {
+				String type = url.getProtocol();
+				String path = url.toURI().getPath();
+				if (type.equals("file")) {
+					classes = getClassNameByFile(path, childPackage);
+				} else if (type.equals("jar")) {
+					classes = getClassNameByJar(path, childPackage);
+				}
+			} else {
+				classes = getClassNameByJars(
+						((URLClassLoader) classLoader).getURLs(), packagePath,
+						childPackage);
 			}
-		} else {
-			classes = getClassNameByJars(
-					((URLClassLoader) classLoader).getURLs(), packagePath,
-					childPackage);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return classes;
 	}
@@ -104,44 +118,42 @@ public class ParseScanPackage {
 	 * @param childPackage
 	 *            是否遍历子包
 	 * @return 类的完整名称
+	 * @throws ClassNotFoundException
+	 * @throws IOException
 	 */
 	private static List<Class<?>> getClassNameByJar(String jarPath,
-			boolean childPackage) {
+			boolean childPackage) throws ClassNotFoundException, IOException {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		String[] jarInfo = jarPath.split("!");
 		String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
 		String packagePath = jarInfo[1].substring(1);
-		try {
-			JarFile jarFile = new JarFile(jarFilePath);
-			Enumeration<JarEntry> entrys = jarFile.entries();
-			while (entrys.hasMoreElements()) {
-				JarEntry jarEntry = entrys.nextElement();
-				String entryName = jarEntry.getName();
-				if (entryName.endsWith(".class")) {
-					if (childPackage) {
-						if (entryName.startsWith(packagePath)) {
-							entryName = entryName.replace("/", ".").substring(
-									0, entryName.lastIndexOf("."));
-							classes.add(Class.forName(entryName));
-						}
+		JarFile jarFile = new JarFile(jarFilePath);
+		Enumeration<JarEntry> entrys = jarFile.entries();
+		while (entrys.hasMoreElements()) {
+			JarEntry jarEntry = entrys.nextElement();
+			String entryName = jarEntry.getName();
+			if (entryName.endsWith(".class")) {
+				if (childPackage) {
+					if (entryName.startsWith(packagePath)) {
+						entryName = entryName.replace("/", ".").substring(0,
+								entryName.lastIndexOf("."));
+						classes.add(Class.forName(entryName));
+					}
+				} else {
+					int index = entryName.lastIndexOf("/");
+					String myPackagePath;
+					if (index != -1) {
+						myPackagePath = entryName.substring(0, index);
 					} else {
-						int index = entryName.lastIndexOf("/");
-						String myPackagePath;
-						if (index != -1) {
-							myPackagePath = entryName.substring(0, index);
-						} else {
-							myPackagePath = entryName;
-						}
-						if (myPackagePath.equals(packagePath)) {
-							entryName = entryName.replace("/", ".").substring(
-									0, entryName.lastIndexOf("."));
-							classes.add(Class.forName(entryName));
-						}
+						myPackagePath = entryName;
+					}
+					if (myPackagePath.equals(packagePath)) {
+						entryName = entryName.replace("/", ".").substring(0,
+								entryName.lastIndexOf("."));
+						classes.add(Class.forName(entryName));
 					}
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return classes;
 	}
@@ -156,13 +168,17 @@ public class ParseScanPackage {
 	 * @param childPackage
 	 *            是否遍历子包
 	 * @return 类的完整名称
+	 * @throws URISyntaxException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
 	private static List<Class<?>> getClassNameByJars(URL[] urls,
-			String packagePath, boolean childPackage) {
+			String packagePath, boolean childPackage)
+			throws URISyntaxException, ClassNotFoundException, IOException {
 		List<Class<?>> classes = new ArrayList<Class<?>>();
 		if (urls != null) {
 			for (URL url : urls) {
-				String urlPath = url.getPath();
+				String urlPath = url.toURI().getPath();
 				// 不必搜索classes文件夹
 				if (urlPath.endsWith("classes/")) {
 					continue;

@@ -114,10 +114,13 @@ public class AutoDataSourceDriver {
 		List<Class<?>> clazzes = new ArrayList<Class<?>>();
 		for (String autoPackage : this.getAutoPackages()) {
 			logger.info("EntityParseScanPackage : " + autoPackage);
+			logger.info("EntityParseScanPackage size : "
+					+ EntityParseScanPackage.getClassName(autoPackage));
 			clazzes.addAll(EntityParseScanPackage.getClassName(autoPackage));
 		}
-		for (Class<?> clzz : clazzes) {
-			logger.info("EntityParseScanPackage clazzes : " + clzz.getName());
+		logger.info("EntityParseScanPackage clazzes size : " + clazzes.size());
+		for (Class<?> clazz : clazzes) {
+			logger.info("EntityParseScanPackage clazzes : " + clazz.getName());
 		}
 		Class<?> dialectClass = Class.forName(this.getDialectClassName());
 		Constructor<?> constructor = dialectClass.getConstructor(
