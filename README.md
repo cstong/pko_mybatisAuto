@@ -2,14 +2,14 @@
 Mybatis Automatically build table
 
 
-1.Dependent jar:
+## Dependent jar:
 
 slf4j-api
 servlet-api
 spring-web
 
 
-2.Listener config in web.xml:
+## Listener config in web.xml:
 
 <!-- mybatis auto listener start -->
 <listener>
@@ -18,7 +18,7 @@ spring-web
 <!-- mybatis auto listener end -->
 
 
-3.Spring config in applicationContext.xml:
+## Spring config in applicationContext.xml:
 
 <bean class="org.mybatis.extension.auto.driver.AutoDataSourceDriver">
 	<property name="auto" value="create" />
@@ -36,7 +36,7 @@ spring-web
 </bean>
 
 
-4.Entity class:
+## Entity class:
 
 package demo.mybatis.pojo;
 
