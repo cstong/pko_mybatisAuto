@@ -10,16 +10,16 @@ Mybatis Automatically build table
 
 
 #### config in web.xml
-
-<![CDATA[<!-- mybatis auto listener start -->
+```
+<!-- mybatis auto listener start -->
 <listener>
 	<listener-class>org.mybatis.extension.auto.listener.AutoDatabaseListener</listener-class>
 </listener>
 <!-- mybatis auto listener end -->]]>
-
+```
 
 #### Spring config in applicationContext.xml
-
+```
 <bean class="org.mybatis.extension.auto.driver.AutoDataSourceDriver">
 	<property name="auto" value="create" />
 	<property name="showSql" value="true" />
@@ -34,7 +34,7 @@ Mybatis Automatically build table
 	<property name="dialectClassName"
 		value="org.mybatis.extension.auto.dialect.MysqlDialect" />
 </bean>
-
+```
 
 #### Entity class
 
