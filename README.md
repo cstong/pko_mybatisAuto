@@ -11,11 +11,11 @@ Mybatis Automatically build table
 
 #### config in web.xml
 
-\\<!-- mybatis auto listener start -->
-\\<listener>
-	\\<listener-class>org.mybatis.extension.auto.listener.AutoDatabaseListener</listener-class>
-\\</listener>
-\\<!-- mybatis auto listener end -->
+<![CDATA[<!-- mybatis auto listener start -->
+<listener>
+	<listener-class>org.mybatis.extension.auto.listener.AutoDatabaseListener</listener-class>
+</listener>
+<!-- mybatis auto listener end -->]]>
 
 
 #### Spring config in applicationContext.xml
