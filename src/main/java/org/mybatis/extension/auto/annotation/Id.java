@@ -20,4 +20,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Id {
 
+	public abstract IdType idType() default IdType.SIMPLE;
+
 }
