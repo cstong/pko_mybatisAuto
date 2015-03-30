@@ -18,7 +18,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * 
- * Automatically create or update table dialect using mysql.
+ * Automatically create table dialect using mysql.
  * 
  * @author popkidorc
  * @creation 2015年3月28日
@@ -26,19 +26,27 @@ import org.springframework.util.ClassUtils;
  */
 public class MysqlDialect extends DatabaseDialect {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
+	/**
+	 * Constructor
+	 * 
+	 * @param connection
+	 * @param isShowSql
+	 * @param isFormatSql
+	 * @param clazzes
+	 */
 	public MysqlDialect(Connection connection, boolean isShowSql,
 			boolean isFormatSql, List<Class<?>> clazzes) {
 		super(connection, isShowSql, isFormatSql, clazzes);
 	}
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void create() throws SQLException {
 		System.out.println("======create====");
 		List<String> sqls = new ArrayList<String>();
 		List<String> foreignSqls = new ArrayList<String>();
-		// 取消外键约束，方便create或者update
+		// Cancel the foreign key constraints , for the create or update
 		sqls.add("SET FOREIGN_KEY_CHECKS = 0;");
 		for (Class<?> clazz : this.clazzes) {
 			StringBuffer sql = new StringBuffer("");
@@ -191,12 +199,13 @@ public class MysqlDialect extends DatabaseDialect {
 					}
 					sql.append("\t" + fieldName + " " + fieldType + "("
 							+ fieldLength + ")");
-					sql.append(!fieldNullable ? " NOT NULL" : "");
+					sql.append(fieldNullable ? "" : " NOT NULL");
 				}
 				if (idField.equals("")) {
 					idField = hasIdAnnotion ? fieldName : "";
 				}
-				// 查看表结构，是否已有该字段
+				// Query the table structure, if the column does not exist,
+				// don't deal with; if not, alter columns
 				String assertField = "DESCRIBE " + tableName + " " + fieldName;
 				PreparedStatement preparedStatement = this.connection
 						.prepareStatement(assertField,
@@ -213,7 +222,7 @@ public class MysqlDialect extends DatabaseDialect {
 							+ " ADD COLUMN ");
 					alterUpdateSql.append(fieldName + " " + fieldType + "("
 							+ fieldLength + ")");
-					alterUpdateSql.append(!fieldNullable ? " NOT NULL" : "");
+					alterUpdateSql.append(fieldNullable ? "" : " NOT NULL");
 					alterUpdateSqls.add(alterUpdateSql.toString());
 				}
 				sql.append(",\n");
@@ -230,6 +239,12 @@ public class MysqlDialect extends DatabaseDialect {
 		this.executeSqls(sqls);
 	}
 
+	/**
+	 * Execute SQL statements
+	 * 
+	 * @param sqls
+	 * @throws SQLException
+	 */
 	private void executeSqls(List<String> sqls) throws SQLException {
 		Statement statement = this.connection.createStatement();
 		for (String sql : sqls) {

@@ -10,19 +10,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+/**
+ * 
+ * Automatically build table listener class. Execute
+ * {@link org.mybatis.extension.auto.driver.AutoDataSourceDriver} 
+ * 'initialization()'.
+ * 
+ * @author popkidorc
+ * @date 2015年3月30日
+ * 
+ */
 public class AutoDatabaseListener implements ServletContextListener {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContext) {
-		// TODO Auto-generated method stub
 		WebApplicationContext springContext = WebApplicationContextUtils
 				.getWebApplicationContext(servletContext.getServletContext());
 		Object object = springContext
 				.getBean(org.mybatis.extension.auto.driver.AutoDataSourceDriver.class);
 		try {
 			object.getClass().getMethod("initialization").invoke(object);
-			logger.info("数据库初使化成功....");
+			logger.info("auto initialize database success");
 		} catch (IllegalAccessException e) {
 			logger.error("IllegalAccessException", e.getCause());
 		} catch (IllegalArgumentException e) {

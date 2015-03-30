@@ -15,37 +15,70 @@ import org.mybatis.extension.auto.parse.EntityParseScanPackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * Automatically build table driven class.
+ * 
+ * @author popkidorc
+ * @date 2015年3月30日
+ * 
+ */
 public class AutoDataSourceDriver {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	/**
-	 * Type the name of the Automatically create table.
+	 * Automatically create table type constant : 'CREATE'. Drop tables and data
+	 * , and create tables.
 	 */
 	private static final String AUTOTYPE_CREATE = "CREATE";
 
 	/**
-	 * Type the name of the Automatically update table.
+	 * Automatically create table type constant : 'UPDATE'. Don't drop tables
+	 * (including columns) and data , and alter new columns.
 	 */
 	private static final String AUTOTYPE_UPDATE = "UPDATE";
 
 	/**
-	 * Type the name of the none.
+	 * Automatically create table type constant : 'NONE'. Don't do any
+	 * operation.
 	 */
 	private static final String AUTOTYPE_NONE = "NONE";
 
-	// 自动执行类型(create、update、none)
+	/**
+	 * Automatically create table type, optional values: 'create' or 'update' or
+	 * 'none'
+	 */
 	private String auto;
-	// 是否打印sql(true、false)
+
+	/**
+	 * Whether to print the SQL statement, optional values: 'true' or 'false'
+	 */
 	private boolean showSql;
-	// 是否格式化sql(true、false) TODO 待实现
+	/**
+	 * Whether to format the SQL statement, optional values: 'true' or 'false'
+	 * TODO
+	 */
 	private boolean formatSql;
-	// 测试sql
+
+	/**
+	 * Test the SQL statement。
+	 */
 	private String testSql;
-	// 自动建表遍历包
+
+	/**
+	 * Automatically create table scan package.<b>required</b>
+	 */
 	private String[] autoPackages;
-	// 针对oracle数据库的方言,特定的关系数据库生成优化的SQL
+
+	/**
+	 * According to the different database dialect, generate relational database
+	 * table SQL, and executed。<b>required</b>
+	 */
 	private String dialectClassName;
-	// 数据源
+
+	/**
+	 * DataSource object.<b>required</b>
+	 */
 	private DataSource dataSource;
 
 	public String getAuto() {
@@ -104,6 +137,18 @@ public class AutoDataSourceDriver {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * 
+	 * AutoDataSourceDriver initialize function. By listener calls.
+	 * 
+	 * {@link org.mybatis.extension.auto.listener.AutoDatabaseListener}
+	 * 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws Exception
+	 */
 	public void initialization() throws SQLException, ClassNotFoundException,
 			InstantiationException, IllegalAccessException, Exception {
 		this.testSql();
@@ -135,6 +180,11 @@ public class AutoDataSourceDriver {
 		}
 	}
 
+	/**
+	 * Execute the test SQL statement.
+	 * 
+	 * @throws SQLException
+	 */
 	private void testSql() throws SQLException {
 		Connection connection = this.getDataSource().getConnection();
 		Statement statement = connection.createStatement();

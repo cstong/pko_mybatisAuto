@@ -3,11 +3,9 @@ package org.mybatis.extension.auto.dialect;
 import java.sql.Connection;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 /**
  * 
- * Automatically create or update table dialect interface
+ * Automatically create table dialect interface
  * 
  * @author popkidorc
  * @creation 2015年3月28日
