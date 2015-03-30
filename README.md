@@ -1,27 +1,27 @@
-# pko_mybatisAuto
+## pko_mybatisAuto
 Mybatis Automatically build table
 
 
-## Dependent jar
+#### Dependent jar
 
 	slf4j-api
 	servlet-api
 	spring-web
 
 
-## config in web.xml
+#### config in web.xml
 
-'<!-- mybatis auto listener start -->
-<listener>
-	<listener-class>org.mybatis.extension.auto.listener.AutoDatabaseListener</listener-class>
-</listener>
-<!-- mybatis auto listener end -->'
+\\<!-- mybatis auto listener start -->
+\\<listener>
+	\\<listener-class>org.mybatis.extension.auto.listener.AutoDatabaseListener</listener-class>
+\\</listener>
+\\<!-- mybatis auto listener end -->
 
 
-### Spring config in applicationContext.xml
+#### Spring config in applicationContext.xml
 
-'<bean class="org.mybatis.extension.auto.driver.AutoDataSourceDriver">'
-	'<property name="auto" value="create" />
+<bean class="org.mybatis.extension.auto.driver.AutoDataSourceDriver">
+	<property name="auto" value="create" />
 	<property name="showSql" value="true" />
 	<property name="formatSql" value="true" />
 	<property name="testSql" value="select 1 from dual;" />
@@ -33,10 +33,10 @@ Mybatis Automatically build table
 	<property name="dataSource" ref="dataSource" />
 	<property name="dialectClassName"
 		value="org.mybatis.extension.auto.dialect.MysqlDialect" />
-</bean>'
+</bean>
 
 
-### Entity class
+#### Entity class
 
 	package demo.mybatis.pojo;
 	
