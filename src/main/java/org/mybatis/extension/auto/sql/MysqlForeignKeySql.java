@@ -23,20 +23,17 @@ public class MysqlForeignKeySql extends BaseSql {
 
 	public StringBuffer getCreateForeignKey() {
 		if (this.isFormatSql) {
-			this.sql.append("\t");
+			this.sql.append("\n");
 		}
-		String foreign_key_name = "FK_" + tableName + "_" + fieldName;
-		this.sql.append("ALTER TABLE " + tableName);
+		String foreign_key_name = "FK_" + this.tableName + "_" + fieldName;
+		this.sql.append("ALTER TABLE " + this.tableName);
 		this.sql.append(" ");
 		this.sql.append("ADD CONSTRAINT " + foreign_key_name);
 		this.sql.append(" ");
-		this.sql.append("FOREIGN KEY(" + fieldName + ")");
+		this.sql.append("FOREIGN KEY(" + this.fieldName + ")");
 		this.sql.append(" ");
-		this.sql.append("REFERENCES " + foreignKeyTableName + "("
-				+ foreignKeyFieldName + ");");
-		if (this.isFormatSql) {
-			this.sql.append("\n");
-		}
+		this.sql.append("REFERENCES " + this.foreignKeyTableName + "("
+				+ this.foreignKeyFieldName + ");");
 		return this.sql;
 	}
 }

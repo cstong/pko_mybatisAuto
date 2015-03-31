@@ -12,6 +12,7 @@ import org.mybatis.extension.auto.annotation.Entity;
 import org.mybatis.extension.auto.annotation.Field;
 import org.mybatis.extension.auto.annotation.ForeignKey;
 import org.mybatis.extension.auto.annotation.Id;
+import org.mybatis.extension.auto.sql.MysqlColumnSql;
 import org.mybatis.extension.auto.sql.MysqlForeignKeySql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +48,11 @@ public class MysqlDialect extends DatabaseDialect {
 		System.out.println("======create====");
 		List<String> sqls = new ArrayList<String>();
 		List<String> foreignSqls = new ArrayList<String>();
+		List<String> primaryKeys = new ArrayList<String>();
 		// Cancel the foreign key constraints , for the create or update
 		sqls.add("SET FOREIGN_KEY_CHECKS = 0;");
 		for (Class<?> clazz : this.clazzes) {
 			StringBuffer sql = new StringBuffer("");
-			String idField = "";
 			if (!clazz.isAnnotationPresent(Entity.class)) {
 				continue;
 			}
@@ -61,68 +62,49 @@ public class MysqlDialect extends DatabaseDialect {
 				tableName = ClassUtils.getShortName(clazz).toUpperCase();
 			}
 			sqls.add("DROP TABLE IF EXISTS " + tableName + ";");
-			sql.append("CREATE TABLE " + tableName + "(\n");
+			sql.append("CREATE TABLE IF NOT EXISTS " + tableName);
+			sql.append("(" + "\n");
 			java.lang.reflect.Field[] fields = clazz.getDeclaredFields();
 			for (java.lang.reflect.Field field : fields) {
 				if (!field.isAnnotationPresent(Field.class)) {
 					continue;
 				}
+				// Prepare variable
 				Field fieldAnnotion = (Field) field.getAnnotation(Field.class);
-				String fieldName = fieldAnnotion.fieldName();
+				String fieldName = fieldAnnotion.fieldName().equals("") ? field
+						.getName().toUpperCase() : fieldAnnotion.fieldName();
 				String fieldType = fieldAnnotion.type().toString();
 				int fieldLength = fieldAnnotion.length();
 				boolean fieldNullable = fieldAnnotion.nullable();
 				boolean fieldIsId = field.isAnnotationPresent(Id.class);
-				String fieldIdType = null;
-				if (fieldIsId) {
-					fieldIdType = field.getAnnotation(Id.class).idType()
-							.toString();
-				}
-				if (fieldName.equals("")) {
-					fieldName = field.getName().toUpperCase();
-				}
-				if (fieldIsId) {
-					fieldType = "INT";
-					fieldLength = 11;
-					sql.append("\t" + fieldName + " " + fieldType + "("
-							+ fieldLength + ") NOT NULL AUTO_INCREMENT");
-				} else {
-					if (fieldAnnotion.fKey().length > 0) {
-						ForeignKey foreignKey = fieldAnnotion.fKey()[0];
-						String foreignKeyTableName = foreignKey.tableName();
-						String foreignKeyFieldName = foreignKey.fieldName();
-						if (!foreignKeyTableName.equals("")
-								&& !foreignKeyFieldName.equals("")) {
-							String foreign_key_name = "FK_" + tableName + "_"
-									+ fieldName;
-							StringBuffer foreignSql = new StringBuffer("");
-							foreignSql.append("ALTER TABLE " + tableName + " ");
-							foreignSql.append("ADD CONSTRAINT "
-									+ foreign_key_name + " FOREIGN KEY("
-									+ fieldName + ") REFERENCES "
-									+ foreignKeyTableName + "("
-									+ foreignKeyFieldName + ");\n");
-							foreignSqls.add(foreignSql.toString());
-							fieldType = "INT";
-							fieldLength = 11;
-						}
-					}
-					if (fieldType.endsWith("INT")) {
-						fieldLength = fieldLength == 255 ? 11 : fieldLength;
-					}
-					sql.append("\t" + fieldName + " " + fieldType + "("
-							+ fieldLength + ")");
-					sql.append(fieldNullable ? "" : " NOT NULL");
-				}
-				if (idField.equals("")) {
-					idField = fieldIsId ? fieldName : "";
-				}
-				sql.append(",\n");
+				String fieldIdType = fieldIsId ? field.getAnnotation(Id.class)
+						.idType().toString() : null;
+				ForeignKey[] fieldForeignKeys = fieldAnnotion.fKey();
+				if (fieldIsId)
+					primaryKeys.add(fieldName);
+				// generate column SQL statement
+				MysqlColumnSql mysqlColumnSql = new MysqlColumnSql(
+						this.isFormatSql, tableName, fieldName, fieldType,
+						fieldLength, fieldNullable, fieldIsId, fieldIdType,
+						fieldForeignKeys);
+				foreignSqls.addAll(mysqlColumnSql.getForeignSqls());
+				sql.append(mysqlColumnSql.getCreateColumn());
+				sql.append(",");
+				sql.append("\n");
 			}
-			if (!idField.equals("")) {
-				sql.append("\tPRIMARY KEY (" + idField + ")");
+			if (primaryKeys.size() > 0) {
+				sql.append("\t");
+				sql.append("PRIMARY KEY (");
+				for (String primaryKey : primaryKeys) {
+					sql.append(primaryKey + ",");
+				}
+				sql.deleteCharAt(sql.length() - 1);
+				sql.append(")");
+				sql.append("\n");
+			} else {
+				sql.deleteCharAt(sql.lastIndexOf(","));
 			}
-			sql.append("\n);");
+			sql.append(");");
 			sqls.add(sql.toString());
 		}
 		sqls.addAll(foreignSqls);
@@ -301,9 +283,16 @@ public class MysqlDialect extends DatabaseDialect {
 						.prepareStatement(assertField,
 								ResultSet.TYPE_SCROLL_INSENSITIVE,
 								ResultSet.CONCUR_READ_ONLY);
-				ResultSet resultSet = preparedStatement.executeQuery();
-				resultSet.last();
-				if (resultSet.getRow() == 0) {
+				ResultSet resultSet;
+				try {
+					resultSet = preparedStatement.executeQuery();
+					resultSet.last();
+				} catch (Exception e) {
+					logger.warn("alter '" + fieldName
+							+ "' column , exception : " + e.getMessage());
+					resultSet = null;
+				}
+				if (resultSet == null || resultSet.getRow() == 0) {
 					if (fieldType.equalsIgnoreCase("INT")) {
 						fieldLength = fieldLength == 255 ? 11 : fieldLength;
 					}
