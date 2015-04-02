@@ -25,7 +25,7 @@ public @interface Column {
 
 	public abstract ForeignKey[] fKey() default {};
 
-	public abstract ColumnType type() default ColumnType.VARCHAR;
+	public abstract ColumnType type() default ColumnType.AUTO;
 
 	public abstract int length() default 255;
 

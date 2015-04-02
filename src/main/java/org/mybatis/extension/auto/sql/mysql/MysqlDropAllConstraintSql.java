@@ -50,11 +50,11 @@ public class MysqlDropAllConstraintSql extends BaseSql implements
 		ResultSet resultSet = this.executeQuery(autoDataSourceParam,
 				queryConstraintSql.toString());
 		while (resultSet.next()) {
-			System.out.println("==REFERENCED_TABLE_NAME=="
-					+ resultSet.getString("REFERENCED_TABLE_NAME"));
 			// drop all foreign keys + drop indexes for foreign keys
 			if (resultSet.getString("REFERENCED_TABLE_NAME") != null
 					&& !"".equals(resultSet.getString("REFERENCED_TABLE_NAME"))) {
+				System.out.println("================="
+						+ resultSet.getString("REFERENCED_TABLE_NAME"));
 				StringBuffer dropForeignKeySql = new StringBuffer();
 				if (autoDataSourceParam.isFormatSql()) {
 					dropForeignKeySql.append("\n");
@@ -69,6 +69,19 @@ public class MysqlDropAllConstraintSql extends BaseSql implements
 						.append(resultSet.getString("CONSTRAINT_NAME"));
 				dropForeignKeySql.append(";");
 				foreignKeySqls.add(dropForeignKeySql.toString());
+				StringBuffer dropIndexSql = new StringBuffer();
+				if (autoDataSourceParam.isFormatSql()) {
+					dropIndexSql.append("\n");
+				}
+				dropIndexSql.append("ALTER TABLE");
+				dropIndexSql.append(" ");
+				dropIndexSql.append(tableEntity.getTableName());
+				dropIndexSql.append(" ");
+				dropIndexSql.append("DROP INDEX");
+				dropIndexSql.append(" ");
+				dropIndexSql.append(resultSet.getString("CONSTRAINT_NAME"));
+				dropIndexSql.append(";");
+				foreignKeySqls.add(dropIndexSql.toString());
 			} else
 			// alter primary keys
 			{
@@ -91,19 +104,6 @@ public class MysqlDropAllConstraintSql extends BaseSql implements
 				primaryKeySqls.add(alterPrimaryKeySql.toString());
 				isExsitPrimaryKey = true;
 			}
-			StringBuffer dropIndexSql = new StringBuffer();
-			if (autoDataSourceParam.isFormatSql()) {
-				dropIndexSql.append("\n");
-			}
-			dropIndexSql.append("ALTER TABLE");
-			dropIndexSql.append(" ");
-			dropIndexSql.append(tableEntity.getTableName());
-			dropIndexSql.append(" ");
-			dropIndexSql.append("DROP INDEX");
-			dropIndexSql.append(" ");
-			dropIndexSql.append(resultSet.getString("CONSTRAINT_NAME"));
-			dropIndexSql.append(";");
-			foreignKeySqls.add(dropIndexSql.toString());
 		}
 		// drop all primary key
 		if (isExsitPrimaryKey) {

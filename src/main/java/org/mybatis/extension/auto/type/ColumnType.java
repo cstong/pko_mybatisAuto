@@ -9,5 +9,5 @@ package org.mybatis.extension.auto.type;
  * 
  */
 public enum ColumnType {
-	VARCHAR, INT, TINYINT, SMALLINT, TEXT, DATE, DATETIME;
+	AUTO, VARCHAR, INT, TINYINT, SMALLINT, FLOAT, DOUBLE, TEXT, DATE, DATETIME;
 }

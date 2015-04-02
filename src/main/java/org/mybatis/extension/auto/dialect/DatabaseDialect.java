@@ -191,9 +191,6 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 				.getConstraintSql();
 		enableConstraintSql.init(this.autoDataSourceParam, true);
 		this.sqls.addAll(enableConstraintSql.getSqls());
-		for (String string : this.sqls) {
-			System.out.println(string);
-		}
 		this.executeSqls();
 	};
 
@@ -234,8 +231,12 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 						.equals("") ? field.getName().toUpperCase()
 						: fieldAnnotion.columnName());
 				columnEntity.setColumnComment(fieldAnnotion.comment());
-				columnEntity.setColumnType(fieldAnnotion.type().toString());
-				columnEntity.setColumnLength(fieldAnnotion.type().toString()
+				this.autoDataSqlFactory.getColumnTypeMap();
+				columnEntity.setColumnType(fieldAnnotion.type().equals(
+						ColumnType.AUTO) ? this.autoDataSqlFactory
+						.getColumnTypeMap().getColumnType(field.getType())
+						.toString() : fieldAnnotion.type().toString());
+				columnEntity.setColumnLength(columnEntity.getColumnType()
 						.equals(ColumnType.INT.toString())
 						&& fieldAnnotion.length() > 11 ? 11 : fieldAnnotion
 						.length());
@@ -287,19 +288,36 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 	 * @param this.sqls
 	 * @throws SQLException
 	 */
-	private void executeSqls() throws SQLException {
-		this.autoDataSourceParam.getConnection().setAutoCommit(false);
-		Statement statement = this.autoDataSourceParam.getConnection()
-				.createStatement();
-		for (String sql : this.sqls) {
-			if (this.autoDataSourceParam.isShowSql()) {
-				logger.info("mybatiSql : " + sql);
+	private void executeSqls() {
+		try {
+			this.autoDataSourceParam.getConnection().setAutoCommit(false);
+			Statement statement = this.autoDataSourceParam.getConnection()
+					.createStatement();
+			for (String sql : this.sqls) {
+				if (this.autoDataSourceParam.isShowSql()) {
+					logger.info("mybatiSql : " + sql);
+				}
+				statement.addBatch(sql);
 			}
-			statement.addBatch(sql);
+			statement.executeBatch();
+			this.autoDataSourceParam.getConnection().commit();
+		} catch (SQLException e) {
+			logger.error("autoDatabase:" + e.getMessage());
+			e.printStackTrace();
+			try {
+				this.autoDataSourceParam.getConnection().rollback();
+			} catch (SQLException e1) {
+				logger.error("autoDatabase:" + e1.getMessage());
+				e.printStackTrace();
+			}
+		} finally {
+			try {
+				this.autoDataSourceParam.getConnection().setAutoCommit(true);
+				this.autoDataSourceParam.getConnection().close();
+			} catch (SQLException e) {
+				logger.error("autoDatabase:" + e.getMessage());
+				e.printStackTrace();
+			}
 		}
-		statement.executeBatch();
-		this.autoDataSourceParam.getConnection().commit();
-		this.autoDataSourceParam.getConnection().setAutoCommit(true);
-		this.autoDataSourceParam.getConnection().close();
 	}
 }

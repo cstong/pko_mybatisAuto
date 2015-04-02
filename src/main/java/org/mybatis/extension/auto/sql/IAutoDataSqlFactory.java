@@ -17,4 +17,6 @@ public interface IAutoDataSqlFactory {
 	public IDropPrimaryKeySql getDropPrimaryKeySql();
 
 	public IDropTableSql getDropTableSql();
+
+	public IColumnTypeMap getColumnTypeMap();
 }
