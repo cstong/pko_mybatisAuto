@@ -18,9 +18,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface Entity {
+public @interface Table {
 
 	public abstract String tableName() default "";
 
-	public abstract String tableComments() default "";
+	public abstract String comment() default "";
+
+	public abstract String engine() default "InnoDB";
+
+	public abstract String defaultCharset() default "utf8";
 }

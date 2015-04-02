@@ -3,8 +3,6 @@ package org.mybatis.extension.auto.dialect;
 import java.sql.SQLException;
 
 import org.mybatis.extension.auto.driver.AutoDataSourceParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -18,20 +16,18 @@ public class OracleDialect extends DatabaseDialect {
 
 	public OracleDialect(AutoDataSourceParam autoDataSourceParam) {
 		super(autoDataSourceParam);
+		// TODO Auto-generated method stub
+		
 	}
-
-	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Override
 	protected void create() throws SQLException {
-		// TODO Auto-generated method stub
-
+		super.create();
 	}
 
 	@Override
 	protected void update() throws SQLException {
-		// TODO Auto-generated method stub
-
+		super.update();
 	}
 
 }

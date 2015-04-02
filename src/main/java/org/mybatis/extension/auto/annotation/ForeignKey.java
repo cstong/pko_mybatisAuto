@@ -19,7 +19,10 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 public @interface ForeignKey {
+
+	public abstract String foreignKeyName() default "";
+
 	public abstract String tableName();
 
-	public abstract String fieldName();
+	public abstract String columnName();
 }

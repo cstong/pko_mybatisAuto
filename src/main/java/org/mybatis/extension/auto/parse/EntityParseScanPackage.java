@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mybatis.extension.auto.annotation.Entity;
+import org.mybatis.extension.auto.annotation.Table;
 
 /**
  * 
@@ -35,7 +35,7 @@ public class EntityParseScanPackage {
 				true);
 		Iterator<Class<?>> clazzIterable = clazzes.iterator();
 		while (clazzIterable.hasNext()) {
-			if (!clazzIterable.next().isAnnotationPresent(Entity.class)) {
+			if (!clazzIterable.next().isAnnotationPresent(Table.class)) {
 				clazzIterable.remove();
 			}
 		}

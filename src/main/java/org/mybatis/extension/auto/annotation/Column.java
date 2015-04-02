@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.mybatis.extension.auto.type.FieldType;
+import org.mybatis.extension.auto.type.ColumnType;
 
 /**
  * 
@@ -20,17 +20,17 @@ import org.mybatis.extension.auto.type.FieldType;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface Field {
-	public abstract String fieldName() default "";
+public @interface Column {
+	public abstract String columnName() default "";
 
 	public abstract ForeignKey[] fKey() default {};
 
-	public abstract FieldType type() default FieldType.VARCHAR;
+	public abstract ColumnType type() default ColumnType.VARCHAR;
 
 	public abstract int length() default 255;
 
 	public abstract boolean nullable() default true;
 
-	public abstract String fieldComments() default "";
+	public abstract String comment() default "";
 
 }

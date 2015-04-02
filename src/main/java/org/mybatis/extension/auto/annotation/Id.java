@@ -22,6 +22,8 @@ import org.mybatis.extension.auto.type.IdType;
 @Inherited
 public @interface Id {
 
+	public abstract String primaryKeyName() default "";
+	
 	public abstract IdType idType() default IdType.SIMPLE;
 
 }
