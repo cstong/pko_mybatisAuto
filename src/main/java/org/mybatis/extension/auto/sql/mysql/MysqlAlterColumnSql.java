@@ -32,7 +32,6 @@ public class MysqlAlterColumnSql extends BaseSql implements IAlterColumnSql {
 		ResultSet resultSet = this.executeQuery(autoDataSourceParam,
 				describeSql.toString());
 		while (resultSet.next()) {
-			System.out.println(resultSet.getString("FIELD"));
 			existColumnNames.add(resultSet.getString("FIELD"));
 		}
 		for (ColumnEntity columnEntity : tableEntity.getColumnEntities()) {

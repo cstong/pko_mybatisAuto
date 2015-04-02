@@ -3,6 +3,7 @@ package org.mybatis.extension.auto.sql;
 import org.mybatis.extension.auto.sql.mysql.MysqlAlterColumnSql;
 import org.mybatis.extension.auto.sql.mysql.MysqlAlterForeignKeySql;
 import org.mybatis.extension.auto.sql.mysql.MysqlAlterPrimaryKeySql;
+import org.mybatis.extension.auto.sql.mysql.MysqlColumnTypeMap;
 import org.mybatis.extension.auto.sql.mysql.MysqlConstraintSql;
 import org.mybatis.extension.auto.sql.mysql.MysqlCreateTableSql;
 import org.mybatis.extension.auto.sql.mysql.MysqlDropAllConstraintSql;
@@ -49,6 +50,11 @@ public class MysqlAutoDataSqlFactory implements IAutoDataSqlFactory {
 	@Override
 	public IDropTableSql getDropTableSql() {
 		return new MysqlDropTableSql();
+	}
+
+	@Override
+	public IColumnTypeMap getColumnTypeMap() {
+		return new MysqlColumnTypeMap();
 	}
 
 }
