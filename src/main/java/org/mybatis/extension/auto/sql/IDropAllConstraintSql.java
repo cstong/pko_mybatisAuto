@@ -10,11 +10,22 @@ import org.mybatis.extension.auto.sql.entity.TableEntity;
  * Drop all constraint SQL statement
  * 
  * @author popkidorc
- * @date 2015年4月2日
+ * @since 2015年4月2日
  * 
  */
 public interface IDropAllConstraintSql extends IBaseSql {
-
+	
+	/**
+	 * 
+	 * Initialize SQL statement
+	 * 
+	 * @param autoDataSourceParam
+	 *            autoDataSourceParam
+	 * @param tableEntity
+	 *            tableEntity
+	 * @throws SQLException
+	 *             SQLException
+	 */
 	public void init(AutoDataSourceParam autoDataSourceParam,
 			TableEntity tableEntity) throws SQLException;
 }

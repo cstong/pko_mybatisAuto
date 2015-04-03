@@ -4,14 +4,6 @@ import org.mybatis.extension.auto.driver.AutoDataSourceParam;
 import org.mybatis.extension.auto.sql.BaseSql;
 import org.mybatis.extension.auto.sql.IConstraintSql;
 
-/**
- * 
- * Constraint status SQL statement for MySql
- * 
- * @author popkidorc
- * @date 2015年4月1日
- * 
- */
 public class MysqlConstraintSql extends BaseSql implements IConstraintSql {
 
 	@Override

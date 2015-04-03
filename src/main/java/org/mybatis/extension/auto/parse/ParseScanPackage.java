@@ -18,7 +18,7 @@ import java.util.jar.JarFile;
  * @see org.mybatis.extension.auto.parse.EntityParseScanPackage
  * 
  * @author popkidorc
- * @date 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 public class ParseScanPackage {
@@ -28,10 +28,14 @@ public class ParseScanPackage {
 	 * Get a package (including all child package) under all the classes
 	 * 
 	 * @param packageName
-	 * @return classes
-	 * @throws IOException
-	 * @throws URISyntaxException
+	 *            package name
+	 * @return class names
 	 * @throws ClassNotFoundException
+	 *             ClassNotFoundException
+	 * @throws URISyntaxException
+	 *             URISyntaxException
+	 * @throws IOException
+	 *             IOException
 	 */
 	public static List<Class<?>> getClassName(String packageName)
 			throws ClassNotFoundException, URISyntaxException, IOException {
@@ -42,11 +46,16 @@ public class ParseScanPackage {
 	 * Get a package under all the classes
 	 * 
 	 * @param packageName
+	 *            packageName
 	 * @param isChildPackage
-	 * @return classes
+	 *            isChildPackage
+	 * @return class names
 	 * @throws URISyntaxException
+	 *             URISyntaxException
 	 * @throws IOException
+	 *             IOException
 	 * @throws ClassNotFoundException
+	 *             ClassNotFoundException
 	 */
 	public static List<Class<?>> getClassName(String packageName,
 			boolean isChildPackage) throws URISyntaxException,

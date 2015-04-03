@@ -5,7 +5,7 @@ package org.mybatis.extension.auto.sql.entity;
  * Column entity
  * 
  * @author popkidorc
- * @date 2015年4月1日
+ * @since 2015年4月1日
  * 
  */
 public class ColumnEntity {

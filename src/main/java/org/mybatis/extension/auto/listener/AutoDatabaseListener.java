@@ -17,7 +17,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 'initialization()'.
  * 
  * @author popkidorc
- * @date 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 public class AutoDatabaseListener implements ServletContextListener {

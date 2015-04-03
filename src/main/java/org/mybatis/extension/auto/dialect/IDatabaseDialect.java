@@ -7,7 +7,7 @@ import java.sql.SQLException;
  * Automatically create table dialect interface
  * 
  * @author popkidorc
- * @creation 2015年3月28日
+ * @since 2015年3月28日
  * 
  */
 public interface IDatabaseDialect {
@@ -16,7 +16,8 @@ public interface IDatabaseDialect {
 	 * 
 	 * Invoke SQL statement
 	 * 
-	 * @throws Exception
+	 * @throws SQLException
+	 *             invoke SQL exception
 	 */
 	public void invoke() throws SQLException;
 }

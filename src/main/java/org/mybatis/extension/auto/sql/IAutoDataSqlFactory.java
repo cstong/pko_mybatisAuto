@@ -1,5 +1,13 @@
 package org.mybatis.extension.auto.sql;
 
+/**
+ * 
+ * AutoData SQL statement Factory interface
+ * 
+ * @author popkidorc
+ * @since 2015年4月3日
+ * 
+ */
 public interface IAutoDataSqlFactory {
 
 	public IConstraintSql getConstraintSql();

@@ -8,7 +8,7 @@ import java.util.List;
  * Primary key entity
  * 
  * @author popkidorc
- * @date 2015年4月1日
+ * @since 2015年4月1日
  * 
  */
 public class PrimaryKeyEntity {

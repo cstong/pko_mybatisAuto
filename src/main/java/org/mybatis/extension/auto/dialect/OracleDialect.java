@@ -9,7 +9,7 @@ import org.mybatis.extension.auto.driver.AutoDataSourceParam;
  * Automatically create table dialect using mysql.
  * 
  * @author popkidorc
- * @date 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 public class OracleDialect extends DatabaseDialect {

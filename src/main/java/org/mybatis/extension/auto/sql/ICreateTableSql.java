@@ -8,11 +8,20 @@ import org.mybatis.extension.auto.sql.entity.TableEntity;
  * Create table SQL statement
  * 
  * @author popkidorc
- * @date 2015年4月2日
+ * @since 2015年4月2日
  * 
  */
 public interface ICreateTableSql extends IBaseSql {
-
+	
+	/**
+	 * 
+	 * Initialize SQL statement
+	 * 
+	 * @param autoDataSourceParam
+	 *            autoDataSourceParam
+	 * @param tableEntity
+	 *            tableEntity
+	 */
 	public void init(AutoDataSourceParam autoDataSourceParam,
 			TableEntity tableEntity);
 

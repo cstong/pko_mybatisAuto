@@ -9,6 +9,14 @@ import org.mybatis.extension.auto.driver.AutoDataSourceParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * Base SQL statement, implements IBaseSql
+ * 
+ * @author popkidorc
+ * @since 2015年4月3日
+ * 
+ */
 public class BaseSql implements IBaseSql {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -23,6 +31,18 @@ public class BaseSql implements IBaseSql {
 		return sqls;
 	}
 
+	/**
+	 * 
+	 * Execute query SQL statement
+	 * 
+	 * @param autoDataSourceParam
+	 *            autoDataSourceParam
+	 * @param sql
+	 *            SQL statement
+	 * @return ResultSet
+	 * @throws SQLException
+	 *             SQLException
+	 */
 	protected ResultSet executeQuery(AutoDataSourceParam autoDataSourceParam,
 			String sql) throws SQLException {
 		return autoDataSourceParam

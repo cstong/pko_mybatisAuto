@@ -35,7 +35,7 @@ import org.springframework.util.ClassUtils;
  * Automatically create table dialect interface
  * 
  * @author popkidorc
- * @creation 2015年3月28日
+ * @since 2015年3月28日
  * 
  */
 public abstract class DatabaseDialect implements IDatabaseDialect {
@@ -55,6 +55,7 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 	 * Constructor
 	 * 
 	 * @param autoDataSourceParam
+	 *            autoDataSource constructor parameters
 	 */
 	public DatabaseDialect(AutoDataSourceParam autoDataSourceParam) {
 		this.autoDataSourceParam = autoDataSourceParam;
@@ -284,9 +285,6 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 
 	/**
 	 * Execute SQL statements
-	 * 
-	 * @param this.sqls
-	 * @throws SQLException
 	 */
 	private void executeSqls() {
 		try {

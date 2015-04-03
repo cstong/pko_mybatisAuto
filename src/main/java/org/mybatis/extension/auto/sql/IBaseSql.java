@@ -4,13 +4,19 @@ import java.util.List;
 
 /**
  * 
- * SQL statement
+ * SQL statement interface
  * 
  * @author popkidorc
- * @date 2015年4月2日
+ * @since 2015年4月2日
  * 
  */
 public interface IBaseSql {
 
+	/**
+	 * 
+	 * Get SQL statements
+	 * 
+	 * @return SQL statements
+	 */
 	public List<String> getSqls();
 }

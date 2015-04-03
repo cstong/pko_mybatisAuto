@@ -10,7 +10,7 @@ package org.mybatis.extension.auto.type;
  * Automatically create table type constant : 'NONE'. Don't do any operation.
  * 
  * @author popkidorc
- * @date 2015年4月1日
+ * @since 2015年4月1日
  * 
  */
 public enum AutoType {

@@ -7,7 +7,7 @@ import java.util.List;
  * Table entity
  * 
  * @author popkidorc
- * @date 2015年4月1日
+ * @since 2015年4月1日
  * 
  */
 public class TableEntity {

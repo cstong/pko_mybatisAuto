@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * Automatically build table driven class.
  * 
  * @author popkidorc
- * @date 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 public class AutoDataSourceDriver {
@@ -127,10 +127,15 @@ public class AutoDataSourceDriver {
 	 * {@link org.mybatis.extension.auto.listener.AutoDatabaseListener}
 	 * 
 	 * @throws SQLException
+	 *             SQLException
 	 * @throws ClassNotFoundException
+	 *             ClassNotFoundException
 	 * @throws InstantiationException
+	 *             InstantiationException
 	 * @throws IllegalAccessException
+	 *             IllegalAccessException
 	 * @throws Exception
+	 *             Exception
 	 */
 	public void initialization() throws SQLException, ClassNotFoundException,
 			InstantiationException, IllegalAccessException, Exception {

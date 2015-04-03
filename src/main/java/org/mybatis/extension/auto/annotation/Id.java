@@ -13,7 +13,7 @@ import org.mybatis.extension.auto.type.IdType;
  * Id column annotation
  * 
  * @author popkidorc
- * @date 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 @Target({ java.lang.annotation.ElementType.FIELD })
@@ -23,7 +23,7 @@ import org.mybatis.extension.auto.type.IdType;
 public @interface Id {
 
 	public abstract String primaryKeyName() default "";
-	
+
 	public abstract IdType idType() default IdType.SIMPLE;
 
 }

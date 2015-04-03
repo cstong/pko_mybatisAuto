@@ -3,6 +3,14 @@ package org.mybatis.extension.auto.driver;
 import java.sql.Connection;
 import java.util.List;
 
+/**
+ * 
+ * AutoDataSource constructor parameter
+ * 
+ * @author popkidorc
+ * @since 2015年4月3日
+ * 
+ */
 public class AutoDataSourceParam {
 
 	private Connection connection;
@@ -56,11 +64,19 @@ public class AutoDataSourceParam {
 	}
 
 	/**
+	 * 
+	 * Constructor
+	 * 
 	 * @param connection
+	 *            connection
 	 * @param isShowSql
+	 *            isShowSql
 	 * @param isFormatSql
+	 *            isFormatSql
 	 * @param auto
+	 *            auto type
 	 * @param clazzes
+	 *            pojo classes
 	 */
 	public AutoDataSourceParam(Connection connection, boolean isShowSql,
 			boolean isFormatSql, String auto, List<Class<?>> clazzes) {

@@ -14,7 +14,7 @@ import org.mybatis.extension.auto.annotation.Table;
  * @see org.mybatis.extension.auto.parse.ParseScanPackage
  * 
  * @author popkidorc
- * @creation 2015年3月30日
+ * @since 2015年3月30日
  * 
  */
 public class EntityParseScanPackage {
@@ -24,10 +24,14 @@ public class EntityParseScanPackage {
 	 * Access and specify the package and package all the classes
 	 * 
 	 * @param packageName
-	 * @return classes
-	 * @throws IOException
-	 * @throws URISyntaxException
+	 *            package name
+	 * @return class names
 	 * @throws ClassNotFoundException
+	 *             ClassNotFoundException
+	 * @throws URISyntaxException
+	 *             URISyntaxException
+	 * @throws IOException
+	 *             IOException
 	 */
 	public static List<Class<?>> getClassName(String packageName)
 			throws ClassNotFoundException, URISyntaxException, IOException {

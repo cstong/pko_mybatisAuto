@@ -1,0 +1,9 @@
+org.mybatis.extension.auto.annotation
+org.mybatis.extension.auto.dialect
+org.mybatis.extension.auto.driver
+org.mybatis.extension.auto.listener
+org.mybatis.extension.auto.parse
+org.mybatis.extension.auto.sql
+org.mybatis.extension.auto.sql.entity
+org.mybatis.extension.auto.sql.mysql
+org.mybatis.extension.auto.type

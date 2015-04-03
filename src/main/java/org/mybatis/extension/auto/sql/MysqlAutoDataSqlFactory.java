@@ -10,6 +10,15 @@ import org.mybatis.extension.auto.sql.mysql.MysqlDropAllConstraintSql;
 import org.mybatis.extension.auto.sql.mysql.MysqlDropPrimaryKeySql;
 import org.mybatis.extension.auto.sql.mysql.MysqlDropTableSql;
 
+
+/**
+ * 
+ * AutoData SQL statement Factory for Mysql
+ * 
+ * @author popkidorc
+ * @since 2015年4月3日
+ * 
+ */
 public class MysqlAutoDataSqlFactory implements IAutoDataSqlFactory {
 
 	@Override
