@@ -1,7 +1,5 @@
 package org.mybatis.extension.auto.sql;
 
-import java.sql.SQLException;
-
 import org.mybatis.extension.auto.driver.AutoDataSourceParam;
 import org.mybatis.extension.auto.sql.entity.TableEntity;
 

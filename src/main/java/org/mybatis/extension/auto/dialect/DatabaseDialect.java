@@ -77,6 +77,7 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 	 * Create the table using the clazzes , will delete existing data and tables
 	 * 
 	 * @throws SQLException
+	 *             SQLException
 	 */
 	protected void create() throws SQLException {
 		// initialize variable
@@ -135,6 +136,7 @@ public abstract class DatabaseDialect implements IDatabaseDialect {
 	 * in the column
 	 * 
 	 * @throws SQLException
+	 *             SQLException
 	 */
 	protected void update() throws SQLException {
 		// initialize variable
